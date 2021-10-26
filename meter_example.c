@@ -97,9 +97,10 @@ create_meter(uint16_t port_id, uint32_t mtr_id, uint32_t profile_id,
 	params.meter_enable = 1;
 	params.use_prev_mtr_color = 0;
 	params.dscp_table = NULL; /* no input color. */
-	params.action[RTE_COLOR_GREEN] = MTR_POLICER_ACTION_COLOR_GREEN;
-	params.action[RTE_COLOR_YELLOW] = MTR_POLICER_ACTION_COLOR_YELLOW;
-	params.action[RTE_COLOR_RED] = MTR_POLICER_ACTION_DROP;
+
+//	params.action[RTE_COLOR_GREEN] = MTR_POLICER_ACTION_COLOR_GREEN;
+//	params.action[RTE_COLOR_YELLOW] = MTR_POLICER_ACTION_COLOR_YELLOW;
+//	params.action[RTE_COLOR_RED] = MTR_POLICER_ACTION_DROP;
 	/* Enable all stats. */
 	params.stats_mask = RTE_MTR_STATS_N_BYTES_GREEN |
 				RTE_MTR_STATS_N_BYTES_YELLOW |
