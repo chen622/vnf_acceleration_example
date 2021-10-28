@@ -195,6 +195,7 @@ hairpin_one_port_setup(uint16_t port_id, uint64_t nr_hairpin_queues)
 	if (ret)
 		rte_exit(EXIT_FAILURE, "Error: can't get device info, port id:"
 				" %u\n", port_id);
+//    printf("rx_queue: %d\n", dev_info.nb_rx_queues);
 	nr_std_rxq = dev_info.nb_rx_queues - nr_hairpin_queues;
 	nr_std_txq = dev_info.nb_tx_queues - nr_hairpin_queues;
 	nr_queues = dev_info.nb_rx_queues;
@@ -470,8 +471,8 @@ hairpin_one_port_flows_create(void)
 	/* Create the items that will be needed for the decap. */
 	struct rte_ether_hdr eth = {
 		.ether_type = RTE_BE16(RTE_ETHER_TYPE_IPV4),
-		.d_addr.addr_bytes = "\x01\x02\x03\x04\x05\x06",
-		.s_addr.addr_bytes = "\x06\x05\x04\x03\x02\01",
+		.d_addr.addr_bytes = "\x24\x6e\x96\xc9\x57\x8c",
+		.s_addr.addr_bytes = "\xce\x3c\xea\x71\x1c\xab",
 	};
 	struct rte_ipv4_hdr ipv4 = {
 		.dst_addr = RTE_BE32(0xA0A0A0A0),
@@ -490,12 +491,7 @@ hairpin_one_port_flows_create(void)
 	};
 	struct rte_flow_item_ipv4 ipv4_inner = {
 			.hdr = {
-				.src_addr = rte_cpu_to_be_32(0x0A0A0A0A),
-				/* Match on 10.10.10.10 src address */
-				.next_proto_id = IPPROTO_TCP }};
-	struct rte_flow_item_ipv4 ipv4_mask = {
-			.hdr = {
-				.src_addr = RTE_BE32(0xffffffff)}};
+				.next_proto_id = IPPROTO_ICMP }};
 
 	size_t encap_size = sizeof(eth) + sizeof(ipv4) + sizeof(udp) +
 			sizeof(gtp);
@@ -538,8 +534,10 @@ hairpin_one_port_flows_create(void)
 	uint16_t qi;
 	for (qi = 0; qi < dev_info.nb_rx_queues; qi++) {
 		struct rte_eth_dev *dev = &rte_eth_devices[port_id];
-		if (rte_eth_dev_is_rx_hairpin_queue(dev, qi))
-			break;
+		if (rte_eth_dev_is_rx_hairpin_queue(dev, qi)){
+            printf("rx_hairpin_queue is %d", qi);
+            break;
+        }
 	}
 	struct rte_flow_action_queue queue;
 	struct rte_flow_action actions[] = {
@@ -562,9 +560,8 @@ hairpin_one_port_flows_create(void)
 	pattern[L2].type = RTE_FLOW_ITEM_TYPE_ETH;
 	pattern[L2].spec = NULL;
 	pattern[L3].type = RTE_FLOW_ITEM_TYPE_IPV4;
-	pattern[L3].spec = &ipv4_inner;
-	pattern[L3].mask = &ipv4_mask;
-	pattern[L4].type = RTE_FLOW_ITEM_TYPE_TCP;
+//	pattern[L3].spec = &ipv4_inner;
+	pattern[L4].type = RTE_FLOW_ITEM_TYPE_ICMP;
 	queue.index = qi; /* rx hairpin queue index. */
 	flow = rte_flow_create(port_id, &attr, pattern, actions, &error);
 	if (!flow)
