@@ -303,26 +303,26 @@ main(int argc, char **argv) {
         rte_exit(EXIT_FAILURE, "Cannot init mbuf pool\n");
 
     init_ports();
-//    printf(":: %u ports active, setup %u ports hairpin...",
-//           nr_ports, nr_ports);
-//    if (nr_ports == 2)
-//        hairpin_two_ports_setup(nr_hairpin_queues);
-//    else
-//        hairpin_one_port_setup(port_id, nr_hairpin_queues);
-//    printf("done\n");
+    printf(":: %u ports active, setup %u ports hairpin...",
+           nr_ports, nr_ports);
+    if (nr_ports == 2)
+        hairpin_two_ports_setup(nr_hairpin_queues);
+    else
+        hairpin_one_port_setup(port_id, nr_hairpin_queues);
+    printf("done\n");
     start_ports();
-//    printf(":: %u ports hairpin bind...", nr_ports);
-//    if (nr_ports == 2) {
-//        ret = hairpin_two_ports_bind();
-//        if (ret)
-//            rte_exit(EXIT_FAILURE, "Cannot bind two hairpin ports");
-//    }
-//    printf("done\n");
+    printf(":: %u ports hairpin bind...", nr_ports);
+    if (nr_ports == 2) {
+        ret = hairpin_two_ports_bind();
+        if (ret)
+            rte_exit(EXIT_FAILURE, "Cannot bind two hairpin ports");
+    }
+    printf("done\n");
     port_id = rte_eth_find_next(0);
 //    printf(":: warning: only use first port: %u\n", port_id);
 //    /* create flow for send packet with */
     flow = create_gtp_u_decap_rss_flow(port_id, nr_std_queues,
-                                       queues);
+//                                       queues);
 //    flow = create_gtp_u_inner_ip_rss_flow(port_id, nr_std_queues,
 //                                          queues);
 //    flow = create_gtp_u_encap_flow(port_id);
@@ -331,17 +331,17 @@ main(int argc, char **argv) {
 //        printf("Flow can't be created \n");
 //        rte_exit(EXIT_FAILURE, "error in creating flow");
 //    }
-//    printf(":: create hairpin flows...");
-//    if (nr_ports == 2)
-//        flow = hairpin_two_ports_flows_create();
-//    else
-//        flow = hairpin_one_port_flows_create();
-//
-//    if (!flow) {
-//        printf("Hairpin flows can't be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
+    printf(":: create hairpin flows...");
+    if (nr_ports == 2)
+        flow = hairpin_two_ports_flows_create();
+    else
+        flow = hairpin_one_port_flows_create();
+
+    if (!flow) {
+        printf("Hairpin flows can't be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
 //    printf(":: create flow using tag...");
 //    flow = create_flow_with_tag(port_id);
 //    if (!flow) {
