@@ -335,7 +335,7 @@ hairpin_two_ports_flows_create(void)
 	};
 	struct rte_flow_item_ipv4 ipv4_inner = {
 			.hdr = {
-				.src_addr = rte_cpu_to_be_32(0x0A0A0A0A),
+				.src_addr = rte_cpu_to_be_32(0xc0a8282f),
 				/* Match on 10.10.10.10 src address */
 				.next_proto_id = IPPROTO_TCP }};
 	struct rte_flow_item_ipv4 ipv4_mask = {
@@ -375,6 +375,7 @@ hairpin_two_ports_flows_create(void)
 
 	/* create flow on first port and first hairpin queue. */
 	uint16_t port_id = rte_eth_find_next_owned_by(0, RTE_ETH_DEV_NO_OWNER);
+    printf("first port: %d\n",port_id);
 	RTE_ASSERT(port_id != RTE_MAX_ETHPORTS);
 	struct rte_eth_dev_info dev_info;
 	int ret = rte_eth_dev_info_get(port_id, &dev_info);
@@ -471,14 +472,14 @@ hairpin_one_port_flows_create(void)
 	/* Create the items that will be needed for the decap. */
 	struct rte_ether_hdr eth = {
 		.ether_type = RTE_BE16(RTE_ETHER_TYPE_IPV4),
-		.d_addr.addr_bytes = "\x24\x6e\x96\xc9\x57\x8c",
-		.s_addr.addr_bytes = "\xce\x3c\xea\x71\x1c\xab",
+		.d_addr.addr_bytes = "\xce\x3c\xea\x71\x1c\xab",
+		.s_addr.addr_bytes = "\x24\x6e\x96\xc9\x57\x8c",
 	};
 	struct rte_ipv4_hdr ipv4 = {
-		.dst_addr = RTE_BE32(0xA0A0A0A0),
-		.src_addr = RTE_BE32(0xA1A1A0A0),
+		.dst_addr = RTE_BE32(0xc0a82a0c),
+		.src_addr = RTE_BE32(0xc0a8282f),
 		.time_to_live = 20,
-		.next_proto_id = 17,
+		.next_proto_id = IPPROTO_UDP,
 		.version_ihl = 0x45,
 	};
 	struct rte_udp_hdr udp = {
@@ -491,7 +492,7 @@ hairpin_one_port_flows_create(void)
 	};
 	struct rte_flow_item_ipv4 ipv4_inner = {
 			.hdr = {
-				.next_proto_id = IPPROTO_ICMP }};
+				.next_proto_id = IPPROTO_TCP }};
 
 	size_t encap_size = sizeof(eth) + sizeof(ipv4) + sizeof(udp) +
 			sizeof(gtp);
@@ -561,7 +562,7 @@ hairpin_one_port_flows_create(void)
 	pattern[L2].spec = NULL;
 	pattern[L3].type = RTE_FLOW_ITEM_TYPE_IPV4;
 //	pattern[L3].spec = &ipv4_inner;
-	pattern[L4].type = RTE_FLOW_ITEM_TYPE_ICMP;
+	pattern[L4].type = RTE_FLOW_ITEM_TYPE_TCP;
 	queue.index = qi; /* rx hairpin queue index. */
 	flow = rte_flow_create(port_id, &attr, pattern, actions, &error);
 	if (!flow)
