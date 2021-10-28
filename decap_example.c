@@ -86,7 +86,7 @@ create_gtp_u_decap_rss_flow(uint16_t port, uint32_t nb_queues,
 				to give the Decap rule higher priority since
 				it is more specific than RSS */
 	struct rte_flow_item_gtp gtp_spec = {
-			.teid = rte_cpu_to_be_32(1234), /* Set the teid */
+			.teid = rte_cpu_to_be_32(2000097), /* Set the teid */
 			.msg_type = 255 , /* The expected value. */
 			.v_pt_rsv_flags = 2}; /*set sequence number flag*/
 	struct rte_flow_item_gtp gtp_mask = {
@@ -103,8 +103,8 @@ create_gtp_u_decap_rss_flow(uint16_t port, uint32_t nb_queues,
 	/* Create the items that will be needed for the decap. */
 	struct rte_ether_hdr eth = {
 			.ether_type = RTE_BE16(RTE_ETHER_TYPE_IPV4),
-			.d_addr.addr_bytes = "\x01\x02\x03\x04\x05\x06",
-			.s_addr.addr_bytes = "\x06\x05\x04\x03\x02\01" };
+			.d_addr.addr_bytes = "\x00\x0c\x29\x15\xb4\xf4",
+			.s_addr.addr_bytes = "\x00\x0c\x29\x9b\x2f\xa4"};
 	struct rte_flow_item_ipv4 ipv4 = {
 			.hdr = {
 				.next_proto_id = IPPROTO_UDP }};
@@ -115,7 +115,7 @@ create_gtp_u_decap_rss_flow(uint16_t port, uint32_t nb_queues,
 	struct rte_flow_item_gtp gtp;
 	struct rte_flow_item_ipv4 ipv4_inner = {
 			.hdr = {
-				.src_addr = rte_cpu_to_be_32(0x0A0A0A0A),
+				.src_addr = rte_cpu_to_be_32(0x01010162),
 				/* Match on 10.10.10.10 src address */
 				.next_proto_id = IPPROTO_UDP }};
 	struct rte_flow_item_ipv4 ipv4_mask = {
@@ -123,7 +123,7 @@ create_gtp_u_decap_rss_flow(uint16_t port, uint32_t nb_queues,
 				.src_addr = RTE_BE32(0xffffffff)}};
 	struct rte_flow_item_udp udp_inner = {
 			.hdr = {
-				.dst_port = rte_cpu_to_be_16(4000) }};
+				.dst_port = rte_cpu_to_be_16(2003) }};
 				/* Match on udp dest port 4000 */
 	struct rte_flow_item_udp udp_mask = {
 			.hdr = {
