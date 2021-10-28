@@ -322,7 +322,7 @@ main(int argc, char **argv) {
 //    printf(":: warning: only use first port: %u\n", port_id);
 //    /* create flow for send packet with */
     flow = create_gtp_u_decap_rss_flow(port_id, nr_std_queues,
-//                                       queues);
+                                       queues);
 //    flow = create_gtp_u_inner_ip_rss_flow(port_id, nr_std_queues,
 //                                          queues);
 //    flow = create_gtp_u_encap_flow(port_id);
