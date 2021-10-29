@@ -24,7 +24,7 @@ static: build/$(APP)-static
 PKGCONF ?= pkg-config
 
 PC_FILE := $(shell $(PKGCONF) --path libdpdk 2>/dev/null)
-CFLAGS += -O3 $(shell $(PKGCONF) --cflags libdpdk)
+CFLAGS += -O0 -g $(shell $(PKGCONF) --cflags libdpdk)
 # Add flag to allow experimental API as we use rte_pmd_mlx5_sync_flow API
 CFLAGS += -DALLOW_EXPERIMENTAL_API
 LDFLAGS_SHARED = $(shell $(PKGCONF) --libs libdpdk)

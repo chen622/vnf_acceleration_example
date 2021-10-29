@@ -69,7 +69,7 @@ dump_pkt_info(struct rte_mbuf *m, uint16_t qi) {
     eth_hdr = rte_pktmbuf_mtod(m, struct rte_ether_hdr *);
     print_ether_addr("src_mac=", &eth_hdr->s_addr);
     print_ether_addr(" - dst_mac=", &eth_hdr->d_addr);
-    rte_pktmbuf_adj(m, (uint16_t)sizeof(struct rte_ether_hdr));
+    rte_pktmbuf_adj(m, (uint16_t) sizeof(struct rte_ether_hdr));
     ip_hdr = rte_pktmbuf_mtod(m, struct rte_ipv4_hdr *);
 
     print_ip_addr(" - src_ip=", &ip_hdr->src_addr);
@@ -94,10 +94,9 @@ dump_pkt_info(struct rte_mbuf *m, uint16_t qi) {
     printf("\n");
 }
 
-static void
-main_loop(void) {
+static int
+main_loop(void *lcore_port_id) {
     struct rte_mbuf *mbufs[32];
-    struct rte_flow_error error;
     uint16_t nb_rx;
     uint16_t nb_tx;
     uint16_t i;
@@ -105,15 +104,18 @@ main_loop(void) {
 
     while (!force_quit) {
         for (i = 0; i < nr_std_queues; i++) {
-            nb_rx = rte_eth_rx_burst(port_id,
+            nb_rx = rte_eth_rx_burst(*(uint16_t *) lcore_port_id,
                                      i, mbufs, 32);
             if (nb_rx) {
                 for (j = 0; j < nb_rx; j++) {
                     struct rte_mbuf *m = mbufs[j];
-
+                    if (query_counters(*(uint16_t *) lcore_port_id)) {
+                        printf("Failed to query counters\n");
+                        rte_exit(EXIT_FAILURE, "error to sync flows");
+                    }
                     dump_pkt_info(m, i);
                 }
-                nb_tx = rte_eth_tx_burst(port_id, i,
+                nb_tx = rte_eth_tx_burst(*(uint16_t *) lcore_port_id, i,
                                          mbufs, nb_rx);
             }
             /* Free any unsent packets. */
@@ -125,17 +127,7 @@ main_loop(void) {
         }
     }
 
-    /* closing and releasing resources */
-    RTE_ETH_FOREACH_DEV(port_id) {
-        rte_flow_flush(port_id, &error);
-    }
-    if (2 == rte_eth_dev_count_avail())
-        hairpin_two_ports_unbind();
-
-    RTE_ETH_FOREACH_DEV(port_id) {
-        rte_eth_dev_stop(port_id);
-        rte_eth_dev_close(port_id);
-    }
+    return 0;
 }
 
 #define CHECK_INTERVAL 1000  /* 100ms */
@@ -303,26 +295,26 @@ main(int argc, char **argv) {
         rte_exit(EXIT_FAILURE, "Cannot init mbuf pool\n");
 
     init_ports();
-    printf(":: %u ports active, setup %u ports hairpin...",
-           nr_ports, nr_ports);
-    if (nr_ports == 2)
-        hairpin_two_ports_setup(nr_hairpin_queues);
-    else
-        hairpin_one_port_setup(port_id, nr_hairpin_queues);
+//    printf(":: %u ports active, setup %u ports hairpin...",
+//           nr_ports, nr_ports);
+//    if (nr_ports == 2)
+//        hairpin_two_ports_setup(nr_hairpin_queues);
+//    else
+//        hairpin_one_port_setup(port_id, nr_hairpin_queues);
     printf("done\n");
     start_ports();
-    printf(":: %u ports hairpin bind...", nr_ports);
-    if (nr_ports == 2) {
-        ret = hairpin_two_ports_bind();
-        if (ret)
-            rte_exit(EXIT_FAILURE, "Cannot bind two hairpin ports");
-    }
-    printf("done\n");
+//    printf(":: %u ports hairpin bind...", nr_ports);
+//    if (nr_ports == 2) {
+//        ret = hairpin_two_ports_bind();
+//        if (ret)
+//            rte_exit(EXIT_FAILURE, "Cannot bind two hairpin ports");
+//    }
+//    printf("done\n");
     port_id = rte_eth_find_next(0);
 //    printf(":: warning: only use first port: %u\n", port_id);
 //    /* create flow for send packet with */
-    flow = create_gtp_u_decap_rss_flow(port_id, nr_std_queues,
-                                       queues);
+//    flow = create_gtp_u_decap_rss_flow(port_id, nr_std_queues,
+//                                       queues);
 //    flow = create_gtp_u_inner_ip_rss_flow(port_id, nr_std_queues,
 //                                          queues);
 //    flow = create_gtp_u_encap_flow(port_id);
@@ -331,17 +323,17 @@ main(int argc, char **argv) {
 //        printf("Flow can't be created \n");
 //        rte_exit(EXIT_FAILURE, "error in creating flow");
 //    }
-    printf(":: create hairpin flows...");
-    if (nr_ports == 2)
-        flow = hairpin_two_ports_flows_create();
-    else
-        flow = hairpin_one_port_flows_create();
-
-    if (!flow) {
-        printf("Hairpin flows can't be created\n");
-        rte_exit(EXIT_FAILURE, "error in creating flow");
-    }
-    printf("done\n");
+//    printf(":: create hairpin flows...");
+//    if (nr_ports == 2)
+//        flow = hairpin_two_ports_flows_create();
+//    else
+//        flow = hairpin_one_port_flows_create();
+//
+//    if (!flow) {
+//        printf("Hairpin flows can't be created\n");
+//        rte_exit(EXIT_FAILURE, "error in creating flow");
+//    }
+//    printf("done\n");
 //    printf(":: create flow using tag...");
 //    flow = create_flow_with_tag(port_id);
 //    if (!flow) {
@@ -417,12 +409,12 @@ main(int argc, char **argv) {
 //        rte_exit(EXIT_FAILURE, "error in creating flow");
 //    }
 //    printf("done\n");
-//    printf(":: create flows with counter ..");
-//    if (create_flow_with_counter(port_id)) {
-//        printf("Flows with counter cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
+    printf(":: create flows with counter ..");
+    if (create_flow_with_counter(port_id)) {
+        printf("Flows with counter cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
 //    ret = sync_all_flows(port_id);
 //    if (ret) {
 //        printf("Failed to sync flows, flows may not take effect!\n");
@@ -442,7 +434,38 @@ main(int argc, char **argv) {
 //    }
 //    printf("done\n");
 
-    main_loop();
+    unsigned lcore_id;
+    /* Launches the function on each lcore. 8< */
+    RTE_LCORE_FOREACH_WORKER(lcore_id) {
+        printf("lcore: %d", lcore_id);
+        /* Simpler equivalent. 8< */
+        unsigned new_core = lcore_id;
+        rte_eal_remote_launch(main_loop, &new_core, lcore_id);
+        /* >8 End of simpler equivalent. */
+    }
+
+//    /* call it on main lcore too */
+    unsigned new_core = 0;
+    main_loop(&new_core);
+    /* >8 End of launching the function on each lcore. */
+
+    rte_eal_mp_wait_lcore();
+
+    /* closing and releasing resources */
+    RTE_ETH_FOREACH_DEV(port_id) {
+        struct rte_flow_error error;
+        rte_flow_flush(port_id, &error);
+    }
+    if (2 == rte_eth_dev_count_avail())
+        hairpin_two_ports_unbind();
+
+    RTE_ETH_FOREACH_DEV(port_id) {
+        rte_eth_dev_stop(port_id);
+        rte_eth_dev_close(port_id);
+    }
+
+    /* clean up the EAL */
+    rte_eal_cleanup();
 
     return 0;
 }
