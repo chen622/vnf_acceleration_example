@@ -83,12 +83,12 @@ create_flow_with_counter(uint16_t port) {
     };
     struct rte_flow_item_ipv4 ipv4_spec = {
             .hdr = {
-                    .src_addr = RTE_BE32(RTE_IPV4(192, 168, 36, 131)),
+                    .dst_addr = RTE_BE32(RTE_IPV4(92, 243, 24, 197)),
             },
     };
     struct rte_flow_item_ipv4 ipv4_mask = {
             .hdr = {
-                    .src_addr = RTE_BE32(INT32_MAX),
+                    .dst_addr = RTE_BE32(INT32_MAX),
             },
     };
     pattern[L2].type = RTE_FLOW_ITEM_TYPE_ETH;
@@ -103,13 +103,15 @@ create_flow_with_counter(uint16_t port) {
                error.message);
         return -1;
     }
-    actions[0].conf = &shared_counter;
-	flow2 = rte_flow_create(1, &attr, pattern, actions, &error);
-	if (!flow2) {
-		printf("Can't create second flow with shared count. %s\n",
-		       error.message);
-		return -1;
-	}
+    actions[0].conf = &dedicated_counter;
+    dedicated_counter.id = 2;
+    ipv4_spec.hdr.dst_addr = RTE_BE32(RTE_IPV4(164, 52, 33, 179));
+    flow2 = rte_flow_create(port, &attr, pattern, actions, &error);
+    if (!flow2) {
+        printf("Can't create second flow with shared count. %s\n",
+               error.message);
+        return -1;
+    }
 //	actions[0].conf = &dedicated_counter;
 //    dedicated_counter.id = 3;
 //	ipv4_spec.hdr.dst_addr = RTE_BE32(RTE_IPV4(164, 52, 33, 179));
@@ -139,7 +141,7 @@ query_counters(uint16_t port) {
     struct rte_flow_action actions[2];
     actions[1].type = RTE_FLOW_ACTION_TYPE_END;
     actions[0].type = RTE_FLOW_ACTION_TYPE_COUNT;
-    actions[0].conf = &shared_counter;
+    actions[0].conf = &dedicated_counter;
     if (rte_flow_query(port, flow1, actions, &query_counter, &error)) {
         printf("Can't query flow1's counter, msg: %s\n", error.message);
         return -1;
@@ -148,14 +150,16 @@ query_counters(uint16_t port) {
            "bytes[%"PRIu64"]\n", query_counter.hits_set,
            query_counter.bytes_set, query_counter.hits,
            query_counter.bytes);
-//	if (rte_flow_query(port, flow2, actions, &query_counter, &error)) {
-//		printf("Can't query flow2's counter, msg: %s\n", error.message);
-//		return -1;
-//	}
-//	printf("flow2 counter: hits_set[%u], bytes_set[%u], hits[%"PRIu64"], "
-//			"bytes[%"PRIu64"]\n", query_counter.hits_set,
-//			query_counter.bytes_set, query_counter.hits,
-//			query_counter.bytes);
+
+    dedicated_counter.id = 2;
+    if (rte_flow_query(port, flow2, actions, &query_counter, &error)) {
+        printf("Can't query flow2's counter, msg: %s\n", error.message);
+        return -1;
+    }
+    printf("flow2 counter: hits_set[%u], bytes_set[%u], hits[%"PRIu64"], "
+           "bytes[%"PRIu64"]\n", query_counter.hits_set,
+           query_counter.bytes_set, query_counter.hits,
+           query_counter.bytes);
 //	actions[0].conf = &dedicated_counter;
 //	if (rte_flow_query(port, flow3, actions, &query_counter, &error)) {
 //		printf("Can't query flow3's counter, msg: %s\n", error.message);

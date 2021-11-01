@@ -434,22 +434,22 @@ main(int argc, char **argv) {
 //    }
 //    printf("done\n");
 
-    unsigned lcore_id;
-    /* Launches the function on each lcore. 8< */
-    RTE_LCORE_FOREACH_WORKER(lcore_id) {
-        printf("lcore: %d", lcore_id);
-        /* Simpler equivalent. 8< */
-        unsigned new_core = lcore_id;
-        rte_eal_remote_launch(main_loop, &new_core, lcore_id);
-        /* >8 End of simpler equivalent. */
-    }
+//    unsigned lcore_id;
+//    /* Launches the function on each lcore. 8< */
+//    RTE_LCORE_FOREACH_WORKER(lcore_id) {
+//        printf("lcore: %d", lcore_id);
+//        /* Simpler equivalent. 8< */
+//        unsigned new_core = lcore_id;
+//        rte_eal_remote_launch(main_loop, &new_core, lcore_id);
+//        /* >8 End of simpler equivalent. */
+//    }
 
 //    /* call it on main lcore too */
     unsigned new_core = 0;
     main_loop(&new_core);
     /* >8 End of launching the function on each lcore. */
 
-    rte_eal_mp_wait_lcore();
+//    rte_eal_mp_wait_lcore();
 
     /* closing and releasing resources */
     RTE_ETH_FOREACH_DEV(port_id) {
