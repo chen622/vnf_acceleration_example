@@ -295,112 +295,112 @@ main(int argc, char **argv) {
         rte_exit(EXIT_FAILURE, "Cannot init mbuf pool\n");
 
     init_ports();
-//    printf(":: %u ports active, setup %u ports hairpin...",
-//           nr_ports, nr_ports);
-//    if (nr_ports == 2)
-//        hairpin_two_ports_setup(nr_hairpin_queues);
-//    else
-//        hairpin_one_port_setup(port_id, nr_hairpin_queues);
+    printf(":: %u ports active, setup %u ports hairpin...",
+           nr_ports, nr_ports);
+    if (nr_ports == 2)
+        hairpin_two_ports_setup(nr_hairpin_queues);
+    else
+        hairpin_one_port_setup(port_id, nr_hairpin_queues);
     printf("done\n");
     start_ports();
-//    printf(":: %u ports hairpin bind...", nr_ports);
-//    if (nr_ports == 2) {
-//        ret = hairpin_two_ports_bind();
-//        if (ret)
-//            rte_exit(EXIT_FAILURE, "Cannot bind two hairpin ports");
-//    }
-//    printf("done\n");
+    printf(":: %u ports hairpin bind...", nr_ports);
+    if (nr_ports == 2) {
+        ret = hairpin_two_ports_bind();
+        if (ret)
+            rte_exit(EXIT_FAILURE, "Cannot bind two hairpin ports");
+    }
+    printf("done\n");
     port_id = rte_eth_find_next(0);
-//    printf(":: warning: only use first port: %u\n", port_id);
-//    /* create flow for send packet with */
-//    flow = create_gtp_u_decap_rss_flow(port_id, nr_std_queues,
-//                                       queues);
-//    flow = create_gtp_u_inner_ip_rss_flow(port_id, nr_std_queues,
-//                                          queues);
-//    flow = create_gtp_u_encap_flow(port_id);
-//    flow = create_gtp_u_psc_encap_flow(port_id);
-//    if (!flow) {
-//        printf("Flow can't be created \n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf(":: create hairpin flows...");
-//    if (nr_ports == 2)
-//        flow = hairpin_two_ports_flows_create();
-//    else
-//        flow = hairpin_one_port_flows_create();
-//
-//    if (!flow) {
-//        printf("Hairpin flows can't be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
-//    printf(":: create flow using tag...");
-//    flow = create_flow_with_tag(port_id);
-//    if (!flow) {
-//        printf("Flow with TAG cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
-//    printf(":: create flow with sampling action...");
-//    flow = create_flow_with_sampling(port_id);
-//    if (!flow) {
-//        printf("Flow with sampling cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
-//    printf(":: create flow with sampling action...");
-//    flow = create_nic_flow_with_mirror(port_id, 2, 1);
-//    if (!flow) {
-//        printf("Flow with mirror on NIC RX domain cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
-//    printf(":: create flow with symmetric RSS action...");
-//    if (create_symmetric_rss_flow(port_id, nr_std_queues, queues)) {
-//        printf("Flow with symmetric RSS cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
-////	printf(":: create flow with meter...");
-////	if (create_flow_with_meter(port_id)) {
-////		printf("Flow with meter cannot be created\n");
-////		rte_exit(EXIT_FAILURE, "error in creating flow");
-////	}
-////	printf("done\n");
+    printf(":: warning: only use first port: %u\n", port_id);
+    /* create flow for send packet with */
+    flow = create_gtp_u_decap_rss_flow(port_id, nr_std_queues,
+                                       queues);
+    flow = create_gtp_u_inner_ip_rss_flow(port_id, nr_std_queues,
+                                          queues);
+    flow = create_gtp_u_encap_flow(port_id);
+    flow = create_gtp_u_psc_encap_flow(port_id);
+    if (!flow) {
+        printf("Flow can't be created \n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf(":: create hairpin flows...");
+    if (nr_ports == 2)
+        flow = hairpin_two_ports_flows_create();
+    else
+        flow = hairpin_one_port_flows_create();
+
+    if (!flow) {
+        printf("Hairpin flows can't be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
+    printf(":: create flow using tag...");
+    flow = create_flow_with_tag(port_id);
+    if (!flow) {
+        printf("Flow with TAG cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
+    printf(":: create flow with sampling action...");
+    flow = create_flow_with_sampling(port_id);
+    if (!flow) {
+        printf("Flow with sampling cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
+    printf(":: create flow with sampling action...");
+    flow = create_nic_flow_with_mirror(port_id, 2, 1);
+    if (!flow) {
+        printf("Flow with mirror on NIC RX domain cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
+    printf(":: create flow with symmetric RSS action...");
+    if (create_symmetric_rss_flow(port_id, nr_std_queues, queues)) {
+        printf("Flow with symmetric RSS cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
+//	printf(":: create flow with meter...");
+//	if (create_flow_with_meter(port_id)) {
+//		printf("Flow with meter cannot be created\n");
+//		rte_exit(EXIT_FAILURE, "error in creating flow");
+//	}
+//	printf("done\n");
 //    printf(":: create flow match on GTP QFI...");
 //    if (create_gtp_u_qfi_flow(port_id)) {
 //        printf("Flow match on GTP QFI cannot be created\n");
 //        rte_exit(EXIT_FAILURE, "error in creating flow");
 //    }
-//    printf("done\n");
-//    printf(":: create flow with age action...");
-//    if (create_flow_with_age(port_id)) {
-//        printf("Flow with age cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
-//    printf(":: create GRE RSS flow ..");
-//    flow = create_gre_decap_rss_flow(port_id, nr_std_queues, queues);
-//    if (!flow) {
-//        printf("GRE RSS decap flows cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in creating flow");
-//    }
-//    printf("done\n");
-//    printf(":: create GRE encap flow ..");
-//    flow = create_gre_encap_flow(port_id);
-//    if (!flow) {
-//        printf("GRE encap flow cannot be created\n");
-//        rte_exit(EXIT_FAILURE, "error in create flow");
-//    }
-//    printf("done\n");
-//    if (nr_ports == 2) {
-//        printf(":: create hairpin flow with meta ..");
-//        if (create_hairpin_meta_flow()) {
-//            printf("Hairpin flow with meta data cannot be created\n");
-//            rte_exit(EXIT_FAILURE, "error in create flow");
-//        }
-//        printf("done\n");
-//    }
+    printf("done\n");
+    printf(":: create flow with age action...");
+    if (create_flow_with_age(port_id)) {
+        printf("Flow with age cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
+    printf(":: create GRE RSS flow ..");
+    flow = create_gre_decap_rss_flow(port_id, nr_std_queues, queues);
+    if (!flow) {
+        printf("GRE RSS decap flows cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in creating flow");
+    }
+    printf("done\n");
+    printf(":: create GRE encap flow ..");
+    flow = create_gre_encap_flow(port_id);
+    if (!flow) {
+        printf("GRE encap flow cannot be created\n");
+        rte_exit(EXIT_FAILURE, "error in create flow");
+    }
+    printf("done\n");
+    if (nr_ports == 2) {
+        printf(":: create hairpin flow with meta ..");
+        if (create_hairpin_meta_flow()) {
+            printf("Hairpin flow with meta data cannot be created\n");
+            rte_exit(EXIT_FAILURE, "error in create flow");
+        }
+        printf("done\n");
+    }
 //    printf(":: create GTP-U shared inner RSS flow ..");
 //    flow = create_gtp_u_inner_ip_shared_rss_flow(port_id, nr_std_queues,
 //                                                 queues);
@@ -415,41 +415,39 @@ main(int argc, char **argv) {
         rte_exit(EXIT_FAILURE, "error in creating flow");
     }
     printf("done\n");
-//    ret = sync_all_flows(port_id);
-//    if (ret) {
-//        printf("Failed to sync flows, flows may not take effect!\n");
-//        rte_exit(EXIT_FAILURE, "error to sync flows");
-//    }
-//
-//    printf(":: query counters ...\n");
-//    if (query_counters(port_id)) {
-//        printf("Failed to query counters\n");
-//        rte_exit(EXIT_FAILURE, "error to sync flows");
-//    }
-//    printf(":: create modify GTP-U TEID flows ..");
-//    ret = create_modify_gtp_teid_flows(port_id);
-//    if (ret) {
-//        printf("Failed to create modify GTP-U TEID flows\n");
-//        rte_exit(EXIT_FAILURE, "error in create flow");
-//    }
-//    printf("done\n");
+//  ret = sync_all_flows(port_id);
+//  if (ret) {
+//    printf("Failed to sync flows, flows may not take effect!\n");
+//    rte_exit(EXIT_FAILURE, "error to sync flows");
+//  }
 
-//    unsigned lcore_id;
-//    /* Launches the function on each lcore. 8< */
-//    RTE_LCORE_FOREACH_WORKER(lcore_id) {
-//        printf("lcore: %d", lcore_id);
-//        /* Simpler equivalent. 8< */
-//        unsigned new_core = lcore_id;
-//        rte_eal_remote_launch(main_loop, &new_core, lcore_id);
-//        /* >8 End of simpler equivalent. */
-//    }
+  printf(":: query counters ...\n");
+  if (query_counters(port_id)) {
+    printf("Failed to query counters\n");
+    rte_exit(EXIT_FAILURE, "error to sync flows");
+  }
+  printf(":: create modify GTP-U TEID flows ..");
+  ret = create_modify_gtp_teid_flows(port_id);
+  if (ret) {
+    printf("Failed to create modify GTP-U TEID flows\n");
+    rte_exit(EXIT_FAILURE, "error in create flow");
+  }
+  printf("done\n");
 
-//    /* call it on main lcore too */
-    unsigned new_core = 0;
-    main_loop(&new_core);
+//  unsigned lcore_id;
+//  /* Launches the function on each lcore. 8< */
+//  RTE_LCORE_FOREACH_WORKER(lcore_id) {
+//    printf("lcore: %d", lcore_id);
+//    /* Simpler equivalent. 8< */
+//    rte_eal_remote_launch(main_loop, &port_id, lcore_id);
+//    /* >8 End of simpler equivalent. */
+//  }
+
+    /* call it on main lcore too */
+    main_loop(&port_id);
     /* >8 End of launching the function on each lcore. */
 
-//    rte_eal_mp_wait_lcore();
+    rte_eal_mp_wait_lcore();
 
     /* closing and releasing resources */
     RTE_ETH_FOREACH_DEV(port_id) {
